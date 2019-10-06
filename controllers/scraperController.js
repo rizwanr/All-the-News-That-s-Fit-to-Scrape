@@ -67,7 +67,7 @@ router.get("/scrape", function (req, res) {
 
 
 // Route for getting all Articles from the db
-router.get("/articles", function (req, res) {
+router.get("/", function (req, res) {
   // Grab every document in the Articles collection
   db.Article.find({})
     .then(function (dbArticle) {
@@ -78,6 +78,8 @@ router.get("/articles", function (req, res) {
         article: dbArticle
       };
       res.render("index", hbsObject);
+      //
+
     })
     .catch(function (err) {
       // If an error occurred, send it to the client
@@ -86,26 +88,69 @@ router.get("/articles", function (req, res) {
 });
 
 
-// Delete One from the DB
-router.get("/delete/:id", function (req, res) {
-  // Remove a note using the objectID
-  db.Article.remove({
-      _id: mongojs.ObjectID(req.params.id)
-    },
-    function (error, removed) {
-      // Log any errors from mongojs
-      if (error) {
-        console.log(error);
-        res.send(error);
-      } else {
-        // Otherwise, send the mongojs response to the browser
-        // This will fire off the success function of the ajax request
-        console.log(removed);
-        res.render("index", hbsObject);
-      }
-    }
-  );
+// Route for getting all Articles from the db
+router.get("/saved", function (req, res) {
+  // Grab every document in the Articles collection
+  db.Article.find({
+      saved: true
+    })
+    .then(function (dbArticle) {
+      console.log(dbArticle)
+      // If we were able to successfully find Articles, send them back to the client
+      var hbsObject = {
+        //the object we pass to the handlebar
+        article: dbArticle
+      };
+      res.render("savedArticles", hbsObject);
+      //
+
+    })
+    .catch(function (err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
 });
+
+
+router.put("/articles/save/:id", function (req, res) {
+  db.Article.findOneAndUpdate({
+      _id: req.params.id
+    }, {
+      saved: true
+    })
+    .then(function (data) {
+      // If we were able to successfully find Articles, send them back to the client
+      console.log(data)
+      res.json(data);
+    })
+    .catch(function (err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });;
+})
+
+router.delete("/articles/delete/:id", function (req, res) {
+  db.Article.findOneAndRemove({
+      _id: req.params.id
+    })
+    .then(function (data) {
+
+      console.log(data)
+      res.json(data);
+    })
+    .catch(function (err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });;
+});
+
+
+
+
+
+
+
+
 
 
 module.exports = router;
