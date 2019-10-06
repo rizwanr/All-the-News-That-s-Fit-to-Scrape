@@ -1,17 +1,5 @@
 const express = require("express");
 const logger = require("morgan");
-const mongoose = require("mongoose");
-
-
-// Our scraping tools
-// Axios is a promised-based http library, similar to jQuery's Ajax method
-// It works on the client and on the server
-const axios = require("axios");
-const cheerio = require("cheerio");
-
-// Require all models
-//var db = require("./models");
-
 
 const PORT = 3000;
 
@@ -29,11 +17,23 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 // Make public a static folder
+
+// Set Handlebars.
+var exphbs = require("express-handlebars");
+
+app.engine("handlebars", exphbs({
+  defaultLayout: "main"
+}));
+app.set("view engine", "handlebars");
+
 app.use(express.static("public"));
 
-app.get('/', (req, res) => {
-  res.send('hello world')
-})
+// Import routes and give the server access to them.
+var routes = require("./controllers/scraperController.js");
+
+
+
+app.use(routes);
 
 // Start our server so that it can begin listening to client requests.
 app.listen(PORT, function () {

@@ -13,10 +13,12 @@ const ArticleSchema = new Schema({
   summary: {
     type: String,
     required: true
+
   },
-  URL: {
+  url: {
     type: String,
     required: true
+
   },
 
   // `note` is an object that stores a Note id
