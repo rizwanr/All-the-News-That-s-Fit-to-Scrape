@@ -1,7 +1,7 @@
 const express = require("express");
 const logger = require("morgan");
 
-const PORT = 3000;
+const PORT = 8080;
 
 // Initialize Express
 const app = express();
