@@ -1,10 +1,13 @@
 const express = require("express");
 const logger = require("morgan");
+const bodyParser = require("body-parser"); //JSON responses
+const path = require("path")
 
-const PORT = 8080;
+const PORT = 3000;
 
 // Initialize Express
 const app = express();
+
 
 
 // Configure middleware
@@ -12,17 +15,21 @@ const app = express();
 // Use morgan logger for logging requests
 app.use(logger("dev"));
 // Parse request body as JSON
-app.use(express.urlencoded({
+app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use(express.json());
+
 // Make public a static folder
 
 // Set Handlebars.
 var exphbs = require("express-handlebars");
 
+
+
+
 app.engine("handlebars", exphbs({
-  defaultLayout: "main"
+  defaultLayout: "main",
+  partialsDir: path.join(__dirname, "/views/layouts/partials")
 }));
 app.set("view engine", "handlebars");
 

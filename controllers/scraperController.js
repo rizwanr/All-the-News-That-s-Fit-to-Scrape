@@ -92,44 +92,47 @@ router.get("/", function (req, res) {
 router.get("/saved", function (req, res) {
   // Grab every document in the Articles collection
   db.Article.find({
-    saved: true
-  })
-    .then(function (dbArticle) {
-      console.log(dbArticle)
-      // If we were able to successfully find Articles, send them back to the client
-      var hbsObject = {
-        //the object we pass to the handlebar
-        article: dbArticle
-      };
-      res.render("savedArticles", hbsObject);
-      //
-
-    })
-    .catch(function (err) {
-      // If an error occurred, send it to the client
-      res.json(err);
+    "saved": true
+  }).populate("notes").exec(function (error, articles){
+    var hbsObject = {
+      article: articles
+    };
+    res.render("saved", hbsObject);
     });
 });
 
 
-// Route for saving/updating an Article's associated Note
-router.post("/article/:id", function (req, res) {
+
+router.post("/note/save/:id", function (req, res) {
   // Create a new note and pass the req.body to the entry
-  db.Note.create(req.body)
-    .then(function (dbNote) {
-      // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
-      // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
-      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-      return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
-    })
-    .then(function (dbArticle) {
-      // If we were able to successfully update an Article, send it back to the client
-      res.json(dbArticle);
-    })
-    .catch(function (err) {
-      // If an error occurred, send it to the client
-      res.json(err);
-    });
+  var newNote = new db.Note({
+    body: req.body.text,
+    article: req.params.id
+  });
+  // And save the new note the db
+  newNote.save(function (error, note) {
+    // Log any errors
+    if (error) {
+      console.log(error);
+    }
+    // Otherwise
+    else {
+      // Use the article id to find and update it's notes
+      db.Article.findOneAndUpdate({ "_id": req.params.id }, { $push: { "notes": note } })
+        // Execute the above query
+        .exec(function (err) {
+          // Log any errors
+          if (err) {
+            console.log(err);
+            res.send(err);
+          }
+          else {
+            // Or send the note to the browser
+            res.send(note);
+          }
+        });
+    }
+  });
 });
 
 
@@ -150,12 +153,10 @@ router.put("/articles/save/:id", function (req, res) {
     });;
 })
 
-//Route for grabbing a specific Article by id, populate it with it's note
-router.get("/articles/:id", function (req, res) {
+// get back all notes for a given article
+router.get("/article/:id", function (req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-  db.Article.find({
-      _id: req.params.id
-    })
+  db.Article.find({ _id: req.params.id })
     // ..and populate all of the notes associated with it
     .populate({
       path: 'note',
@@ -163,7 +164,7 @@ router.get("/articles/:id", function (req, res) {
     })
     .then(function (dbArticle) {
       // If we were able to successfully find an Article with the given id, send it back to the client
-      res.json(dbArticle);
+      res.json(dbArticle.note);
     })
     .catch(function (err) {
       // If an error occurred, send it to the client
@@ -171,7 +172,7 @@ router.get("/articles/:id", function (req, res) {
     });
 });
 
-router.delete("/articles/delete/:id", function (req, res) {
+router.delete("/article/delete/:id", function (req, res) {
   db.Article.findOneAndRemove({
       _id: req.params.id
     })
@@ -184,6 +185,18 @@ router.delete("/articles/delete/:id", function (req, res) {
       // If an error occurred, send it to the client
       res.json(err);
     });;
+});
+
+router.get("/articles/clear", function (req, res) {
+  console.log(req.body)
+  db.Article.deleteMany({}, function (err, result) {
+    if (err) {
+      console.log(err)
+    } else {
+      console.log(result)
+      res.send(true)
+    }
+  })
 });
 
 
