@@ -10,12 +10,17 @@ The New York Time Scraper is an app which captures the title, summary and image 
 
 # Technologies Used
 Node.js
+
 Express.js
-Mongo
+
 Mongoose
+
 Node Packages
+
 cheerio
+
 handlebars
+
 Bootstrap
 
 # Website
