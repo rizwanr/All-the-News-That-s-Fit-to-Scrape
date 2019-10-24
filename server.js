@@ -2,6 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const bodyParser = require("body-parser"); //JSON responses
 const path = require("path")
+const mongoose = require("mongoose");
 
 const PORT = 3000;
 
@@ -35,10 +36,12 @@ app.set("view engine", "handlebars");
 
 app.use(express.static("public"));
 
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+mongoose.connect(MONGODB_URI);
 // Import routes and give the server access to them.
 var routes = require("./controllers/scraperController.js");
-
-
 
 app.use(routes);
 
