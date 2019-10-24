@@ -7,3 +7,11 @@
 .card .card-header .delete-btn {
   right: 160px;
 }
+
+.deleteNote{
+margin-left:50%;
+}
+
+.modal-header .close{
+  margin:0
+}
