@@ -187,6 +187,20 @@ router.delete("/article/delete/:id", function (req, res) {
     });;
 });
 
+router.delete("/note/delete/:id", function (req, res) {
+  db.Note.findOneAndRemove({
+    _id: req.params.id
+  })
+    .then(function (data) {
+      console.log(data)
+      res.json(data);
+    })
+    .catch(function (err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });;
+});
+
 router.get("/articles/clear", function (req, res) {
   console.log(req.body)
   db.Article.deleteMany({}, function (err, result) {

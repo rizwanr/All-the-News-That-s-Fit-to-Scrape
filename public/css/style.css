@@ -1,0 +1,9 @@
+.card .card-header .btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.card .card-header .delete-btn {
+  right: 160px;
+}

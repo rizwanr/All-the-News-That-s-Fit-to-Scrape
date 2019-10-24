@@ -36,6 +36,7 @@ $(document).ready(function () {
       console.log(data)
       $("#noteText" + thisId).val("");
       $('#noteModal'+thisId).modal('hide');
+      location.reload();
     })
   });
 
@@ -54,6 +55,21 @@ $(document).ready(function () {
     });
 
   });
+
+
+  $(".deleteNote").click(function(event){
+    event.preventDefault();
+    const noteId = $(this).attr("data-note-id");
+    const articleId = $(this).attr("data-article-id");
+    $.ajax(`/note/delete/${noteId
+      }`, {
+        type: "DELETE"
+      }).then(function () {
+        $('#noteModal' + articleId).modal('hide');
+        location.reload();
+      });
+  });
+
 
   $(".clear").click(function (event) {
     event.preventDefault();
